@@ -1,0 +1,13 @@
+{
+  "appId": "org.wgralgo.creditmasterychallenge",
+  "appName": "Credit Mastery Challenge",
+  "webDir": "www",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#000000",
+      "androidSplashResourceName": "splash",
+      "showSpinner": false
+    }
+  }
+}

@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#000000" />
+<title>Credit Mastery Challenge</title>
+<style>
+  :root {
+    --gold: #d4af37;
+    --gold-soft: #f5e4b3;
+    --gold-deep: #a8862a;
+    --bg: #000000;
+    --panel: #0c0c0c;
+    --panel-2: #141414;
+    --border: rgba(212, 175, 55, 0.55);
+    --border-strong: #d4af37;
+    --text: #f5f5f5;
+    --muted: #b9b9b9;
+    --green: #22c55e;
+    --green-bg: rgba(34, 197, 94, 0.12);
+    --red: #ef4444;
+    --red-bg: rgba(239, 68, 68, 0.12);
+    --shadow-gold: 0 0 0 1px rgba(212,175,55,0.35), 0 10px 30px rgba(212,175,55,0.08);
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 16px 16px calc(24px + env(safe-area-inset-bottom));
+    padding-top: calc(16px + env(safe-area-inset-top));
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 4px 14px;
+    border-bottom: 1px solid rgba(212,175,55,0.18);
+    margin-bottom: 16px;
+  }
+  .topbar .logo {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: #000; padding: 2px;
+    border: 1px solid var(--border);
+  }
+  .topbar .title-block { display: flex; flex-direction: column; line-height: 1.05; }
+  .topbar .title { font-weight: 800; color: var(--gold); font-size: 16px; letter-spacing: 0.5px; }
+  .topbar .sub   { font-size: 11px; color: var(--muted); letter-spacing: 0.6px; text-transform: uppercase; }
+
+  .screen { display: none; flex: 1; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  .home-hero { text-align: center; padding: 14px 8px 6px; }
+  .home-hero img { width: 70%; max-width: 320px; height: auto; display: block; margin: 0 auto 14px; }
+  .home-hero h1 {
+    font-size: 26px;
+    margin: 6px 0 8px;
+    background: linear-gradient(180deg, #f8e9b3 0%, #d4af37 60%, #8c6c1f 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    letter-spacing: 0.4px;
+  }
+  .home-hero p.tag {
+    color: var(--muted); font-size: 14px; line-height: 1.5; max-width: 460px; margin: 0 auto 22px;
+  }
+
+  .btn {
+    display: block; width: 100%;
+    padding: 16px 18px;
+    font-size: 16px; font-weight: 700;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, #161616 0%, #0a0a0a 100%);
+    color: var(--text);
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .btn + .btn { margin-top: 10px; }
+  .btn:active { transform: scale(0.98); }
+  .btn.primary {
+    background: linear-gradient(180deg, #f8e9b3 0%, #d4af37 60%, #8c6c1f 100%);
+    color: #1a1306;
+    border-color: var(--gold-deep);
+    box-shadow: var(--shadow-gold);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .btn.ghost  { background: transparent; }
+  .btn.small  { padding: 10px 14px; font-size: 14px; }
+
+  .actions { margin-top: 8px; }
+
+  .disclaimer {
+    margin-top: 22px;
+    font-size: 11.5px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.5;
+    padding: 0 6px;
+  }
+
+  .panel {
+    background: linear-gradient(180deg, var(--panel-2) 0%, var(--panel) 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--shadow-gold);
+  }
+  .panel + .panel { margin-top: 12px; }
+
+  .panel h2 { color: var(--gold); margin: 0 0 8px; font-size: 18px; }
+  .panel p  { color: var(--text); margin: 6px 0; line-height: 1.55; font-size: 14.5px; }
+  .panel ul { color: var(--text); margin: 6px 0 6px 20px; padding: 0; line-height: 1.55; font-size: 14.5px; }
+
+  .hud {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .hud .chip {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 6px;
+    text-align: center;
+  }
+  .hud .chip .label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .hud .chip .value { font-size: 16px; color: var(--gold); font-weight: 700; margin-top: 2px; }
+
+  .progress-wrap {
+    height: 8px;
+    background: #1a1a1a;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(212,175,55,0.25);
+  }
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #a8862a 0%, #f5e4b3 100%);
+    transition: width 0.3s ease;
+  }
+
+  .qbadges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--gold-soft);
+    background: #0b0b0b;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+  .badge.cat { color: var(--text); border-color: rgba(255,255,255,0.18); }
+  .badge.beginner     { color: #86efac; border-color: rgba(134,239,172,0.5); }
+  .badge.intermediate { color: #fcd34d; border-color: rgba(252,211,77,0.5); }
+  .badge.advanced     { color: #fca5a5; border-color: rgba(252,165,165,0.5); }
+
+  .question-card { margin-bottom: 12px; }
+  .question-card h3 { color: var(--text); font-size: 18px; line-height: 1.4; margin: 4px 0 0; font-weight: 600; }
+
+  .choices { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .choice {
+    background: var(--panel-2);
+    border: 1.5px solid rgba(255,255,255,0.08);
+    color: var(--text);
+    padding: 14px 14px;
+    border-radius: 12px;
+    font-size: 15px;
+    text-align: left;
+    cursor: pointer;
+    display: flex; align-items: flex-start; gap: 10px;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.05s ease;
+  }
+  .choice:active { transform: scale(0.99); }
+  .choice .marker {
+    flex: 0 0 26px; height: 26px; border-radius: 50%;
+    border: 1.5px solid var(--gold);
+    color: var(--gold); font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .choice:hover { border-color: var(--gold); }
+  .choice.correct {
+    background: var(--green-bg);
+    border-color: var(--green);
+  }
+  .choice.correct .marker { border-color: var(--green); color: var(--green); }
+  .choice.incorrect {
+    background: var(--red-bg);
+    border-color: var(--red);
+  }
+  .choice.incorrect .marker { border-color: var(--red); color: var(--red); }
+  .choice.disabled { cursor: default; }
+
+  .feedback {
+    margin-top: 14px;
+    border-radius: 14px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    background: #0a0a0a;
+  }
+  .feedback h4 { margin: 0 0 8px; font-size: 16px; }
+  .feedback.correct h4 { color: var(--green); }
+  .feedback.incorrect h4 { color: var(--red); }
+  .feedback .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-top: 10px; }
+  .feedback p { margin: 4px 0 0; line-height: 1.55; font-size: 14.5px; color: var(--text); }
+  .feedback .tip-card {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px dashed var(--border);
+    background: rgba(212,175,55,0.06);
+    color: var(--gold-soft);
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .feedback .next-row { margin-top: 14px; }
+
+  .results-card { text-align: center; padding: 22px 18px; }
+  .results-card .rating {
+    font-size: 26px; font-weight: 800;
+    background: linear-gradient(180deg, #f8e9b3 0%, #d4af37 60%, #8c6c1f 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    letter-spacing: 0.4px;
+    margin: 6px 0 4px;
+  }
+  .results-card .score-big { font-size: 44px; font-weight: 800; color: var(--gold); margin: 8px 0 2px; }
+  .results-card .score-sub { font-size: 14px; color: var(--muted); margin-bottom: 14px; }
+  .results-card .feedback-line { color: var(--text); font-size: 14.5px; line-height: 1.55; margin: 0 auto 18px; max-width: 460px; }
+
+  @media (min-width: 600px) {
+    .choices { grid-template-columns: 1fr 1fr; }
+    .home-hero h1 { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <img class="logo" src="logo.png" alt="Credit Mastery Challenge logo" />
+    <div class="title-block">
+      <span class="title">Credit Mastery Challenge&trade;</span>
+      <span class="sub">by WGRALGO &middot; Offline</span>
+    </div>
+  </div>
+
+  <section id="screen-home" class="screen active">
+    <div class="home-hero">
+      <img src="logo.png" alt="Credit Mastery Challenge emblem" />
+      <h1>Credit Mastery Challenge&trade;</h1>
+      <p class="tag">Answer credit questions, build money confidence, and level up your financial superpowers.</p>
+      <div class="actions">
+        <button class="btn primary" id="btn-start">Start Challenge</button>
+        <button class="btn ghost" id="btn-how">How It Works</button>
+        <button class="btn ghost small" id="btn-privacy">Privacy &amp; Disclaimer</button>
+      </div>
+      <p class="disclaimer">Educational awareness only. Not legal, financial, credit repair, lending, banking, or debt-management advice.</p>
+    </div>
+  </section>
+
+  <section id="screen-how" class="screen">
+    <div class="panel">
+      <h2>How It Works</h2>
+      <p>Credit Mastery Challenge is an offline educational quiz with a bank of 50 credit-knowledge questions.</p>
+      <ul>
+        <li>Each round randomly selects 10 questions from the 50-question bank.</li>
+        <li>Pick the best answer from four options.</li>
+        <li>You get instant feedback, the correct answer, an explanation, and a short credit tip.</li>
+        <li>Your score is tallied at the end with a mastery rating.</li>
+        <li>No accounts. No internet. No tracking.</li>
+      </ul>
+      <p style="color: var(--muted); font-size: 12.5px; margin-top: 12px;">
+        This app does not provide legal, financial, credit repair, lending, banking, or debt-management advice.
+      </p>
+    </div>
+    <div class="actions" style="margin-top: 14px;">
+      <button class="btn primary" id="btn-how-start">Start Challenge</button>
+      <button class="btn ghost" data-back="home">Back</button>
+    </div>
+  </section>
+
+  <section id="screen-privacy" class="screen">
+    <div class="panel">
+      <h2>Privacy &amp; Disclaimer</h2>
+      <p><strong>Privacy:</strong></p>
+      <ul>
+        <li>No account required.</li>
+        <li>No ads. No analytics. No trackers.</li>
+        <li>No personal financial data is collected.</li>
+        <li>No answers or scores are sent anywhere.</li>
+        <li>Works fully offline.</li>
+      </ul>
+      <p style="margin-top: 12px;"><strong>Educational disclaimer:</strong></p>
+      <p>Credit Mastery Challenge is for educational awareness only. It does not provide legal, financial, credit repair, lending, banking, or debt-management advice. Credit scoring models vary, and individual situations are different. For personal financial decisions, consult a qualified professional or the relevant financial institution.</p>
+    </div>
+    <div class="actions" style="margin-top: 14px;">
+      <button class="btn ghost" data-back="home">Back</button>
+    </div>
+  </section>
+
+  <section id="screen-quiz" class="screen">
+    <div class="hud">
+      <div class="chip"><div class="label">Question</div><div class="value" id="hud-qnum">1 / 10</div></div>
+      <div class="chip"><div class="label">Score</div><div class="value" id="hud-score">0</div></div>
+      <div class="chip"><div class="label">Streak</div><div class="value" id="hud-streak">0</div></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="progress"></div></div>
+
+    <div class="panel question-card">
+      <div class="qbadges">
+        <span class="badge cat"      id="b-cat">Credit Scores</span>
+        <span class="badge beginner" id="b-diff">Beginner</span>
+      </div>
+      <h3 id="q-text">Question?</h3>
+    </div>
+
+    <div class="choices" id="choices"></div>
+
+    <div id="feedback" class="feedback" style="display:none;">
+      <h4 id="f-head">Correct</h4>
+      <div class="label">Correct answer</div>
+      <p id="f-answer"></p>
+      <div class="label">Explanation</div>
+      <p id="f-explain"></p>
+      <div class="tip-card" id="f-tip"></div>
+      <div class="next-row">
+        <button class="btn primary" id="btn-next">Next Question</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-results" class="screen">
+    <div class="panel results-card">
+      <div class="rating" id="r-rating">Credit Builder</div>
+      <div class="score-big" id="r-score">0 / 10</div>
+      <div class="score-sub" id="r-pct">0%</div>
+      <p class="feedback-line" id="r-feedback">Nice work.</p>
+    </div>
+    <div class="actions" style="margin-top: 14px;">
+      <button class="btn primary" id="btn-again">Play Again</button>
+      <button class="btn ghost"   id="btn-home">Home</button>
+    </div>
+    <p class="disclaimer">Educational awareness only. Not legal, financial, credit repair, lending, banking, or debt-management advice.</p>
+  </section>
+
+</div>
+
+<script>
+"use strict";
+
+const BANK = [
+  {category:"Credit Scores", difficulty:"Beginner",
+   q:"Which of the following is generally one of the largest factors in most credit-scoring models?",
+   choices:["Payment history","Number of credit cards in your wallet","Your annual salary","The brand of your bank"],
+   correct:0,
+   explain:"Payment history is one of the most heavily weighted factors in widely used scoring models.",
+   tip:"Paying on time, every time, is one of the most reliable habits for building credit health."},
+
+  {category:"Credit Scores", difficulty:"Beginner",
+   q:"FICO scores typically range from:",
+   choices:["0 to 100","300 to 850","1 to 1000","500 to 999"],
+   correct:1,
+   explain:"Common FICO score ranges go from 300 to 850, with higher scores generally seen as lower risk.",
+   tip:"Different lenders may use different score versions, but the 300-850 range is the most common."},
+
+  {category:"Credit Scores", difficulty:"Intermediate",
+   q:"You can have:",
+   choices:["Only one credit score, ever","Different credit scores from different scoring models and bureaus","One score per bank account","A single national score required by law"],
+   correct:1,
+   explain:"There are multiple scoring models (FICO versions, VantageScore, etc.) and three major bureaus, so you can have many different scores.",
+   tip:"Don't panic if two apps show slightly different scores - they may use different models or data sources."},
+
+  {category:"Credit Scores", difficulty:"Beginner",
+   q:"A higher credit score generally signals to lenders that you are:",
+   choices:["Wealthier","Younger","Statistically less likely to default","Required to be approved"],
+   correct:2,
+   explain:"Scores are a statistical estimate of credit risk - higher scores generally indicate lower predicted risk of default.",
+   tip:"A high score is not a guarantee of approval; lenders also look at income, debt, and other factors."},
+
+  {category:"Payment History", difficulty:"Beginner",
+   q:"Which habit most directly supports a strong payment history?",
+   choices:["Closing accounts immediately after paying them off","Paying on or before the due date every month","Skipping payments you cannot fully pay off","Making payments only in cash"],
+   correct:1,
+   explain:"Consistently paying on time is the core of a strong payment history.",
+   tip:"Set up autopay for at least the minimum to avoid accidental missed payments."},
+
+  {category:"Payment History", difficulty:"Intermediate",
+   q:"A payment is most commonly reported as late to the credit bureaus when it is:",
+   choices:["1 day past due","5 days past due","30 or more days past due","Only after the account is closed"],
+   correct:2,
+   explain:"Many lenders report payments to the credit bureaus once they are 30 or more days past due.",
+   tip:"If you realize you missed a payment, paying it before it hits 30 days late can help avoid a credit-report mark."},
+
+  {category:"Credit Utilization", difficulty:"Beginner",
+   q:"Credit utilization on a credit card is best described as:",
+   choices:["Your card's interest rate","The balance you owe divided by the credit limit","The number of cards you own","Your monthly minimum payment"],
+   correct:1,
+   explain:"Utilization is typically the reported balance divided by the credit limit, often expressed as a percentage.",
+   tip:"Lower utilization is generally viewed more favorably than high utilization."},
+
+  {category:"Credit Utilization", difficulty:"Intermediate",
+   q:"All else equal, which utilization level is generally most favorable for credit health?",
+   choices:["95%","60%","10%","Exactly 0% on every card, every month"],
+   correct:2,
+   explain:"Low single-digit utilization is generally viewed favorably. Very high utilization can hurt scores.",
+   tip:"There is no magic number, but keeping utilization low is widely viewed as helpful."},
+
+  {category:"Credit Utilization", difficulty:"Advanced",
+   q:"Which of these is the most accurate statement about utilization?",
+   choices:["It is calculated only across closed cards","Per-card and overall utilization can both matter in some scoring models","It is irrelevant to credit scores","It is only based on cash advances"],
+   correct:1,
+   explain:"Several scoring models look at both per-card and aggregate utilization, not just one or the other.",
+   tip:"A single maxed-out card can drag your score even if your overall utilization looks low."},
+
+  {category:"Hard Inquiries", difficulty:"Beginner",
+   q:"A 'hard inquiry' typically happens when:",
+   choices:["You log in to a budgeting app","You apply for new credit and a lender pulls your credit report","You check your own score in a free app","You pay your credit card bill"],
+   correct:1,
+   explain:"Hard inquiries usually occur when you apply for new credit and a lender reviews your full credit report.",
+   tip:"Spacing out credit applications can help reduce the number of hard inquiries on your report."},
+
+  {category:"Hard Inquiries", difficulty:"Intermediate",
+   q:"A single hard inquiry usually has:",
+   choices:["A small, often temporary effect on credit scores","A permanent 100-point drop","No effect of any kind","An effect on your tax refund"],
+   correct:0,
+   explain:"A single hard inquiry tends to have a small, temporary effect, though many inquiries in a short window can have a larger impact.",
+   tip:"Rate-shopping for the same type of loan in a short window is often treated more leniently by some scoring models."},
+
+  {category:"Soft Inquiries", difficulty:"Beginner",
+   q:"Checking your own credit score through a typical free consumer tool is generally:",
+   choices:["A hard inquiry","A soft inquiry that does not lower your score","A penalty","Reported as a late payment"],
+   correct:1,
+   explain:"Checking your own score through standard consumer tools is usually a soft inquiry and does not lower your score.",
+   tip:"Reviewing your own credit regularly is a healthy habit, not a punishment."},
+
+  {category:"Soft Inquiries", difficulty:"Intermediate",
+   q:"Pre-approval offers from lenders often appear on your report as:",
+   choices:["Hard inquiries that lower your score","Soft inquiries that do not affect your score","Public records","Collections"],
+   correct:1,
+   explain:"Pre-approval pulls are typically soft inquiries and generally do not affect your score.",
+   tip:"A pre-approval is not the same as a guaranteed final approval - terms can change after a full application."},
+
+  {category:"Credit Reports", difficulty:"Beginner",
+   q:"A credit report generally includes:",
+   choices:["Your social media posts","A list of credit accounts, payment history, and inquiries","Your dating profile","Your daily expenses"],
+   correct:1,
+   explain:"Credit reports typically include identifying information, credit accounts, payment history, inquiries, and certain public records.",
+   tip:"Review your credit reports periodically for errors or unfamiliar accounts."},
+
+  {category:"Credit Reports", difficulty:"Beginner",
+   q:"In the United States, consumers are generally entitled to:",
+   choices:["No access to their credit reports","Free credit reports from the major bureaus through the official source","Reports only if they pay $200","Reports only after a loan denial"],
+   correct:1,
+   explain:"U.S. consumers can request free credit reports from the major bureaus through the official annual credit report source.",
+   tip:"Spacing out free report requests across the year can help you monitor changes."},
+
+  {category:"Credit Reports", difficulty:"Intermediate",
+   q:"If you spot an error on your credit report, a reasonable first step is to:",
+   choices:["Ignore it","File a dispute with the credit bureau and/or the data furnisher","Cancel all your accounts","Stop paying all your bills"],
+   correct:1,
+   explain:"You generally have the right to dispute inaccurate information with the credit bureau reporting it and the company that furnished the data.",
+   tip:"Keep notes and copies of any dispute correspondence in case you need to follow up."},
+
+  {category:"Credit Cards", difficulty:"Beginner",
+   q:"A credit card's APR represents:",
+   choices:["Annual fees only","The annualized cost of borrowing, expressed as a percentage","A reward percentage","The card's credit limit"],
+   correct:1,
+   explain:"APR (annual percentage rate) reflects the annualized cost of borrowing, usually as a percentage.",
+   tip:"Paying the statement balance in full each month generally avoids interest charges on standard purchases."},
+
+  {category:"Credit Cards", difficulty:"Intermediate",
+   q:"If you pay only the minimum due each month on a credit card carrying a balance, you generally:",
+   choices:["Pay off the balance very quickly","Pay much more in interest over time and take much longer to pay it off","Avoid all interest","Get a free score boost"],
+   correct:1,
+   explain:"Paying only the minimum on a balance typically leads to more interest paid and a much longer payoff period.",
+   tip:"Even small amounts above the minimum can meaningfully shorten payoff time."},
+
+  {category:"Credit Cards", difficulty:"Advanced",
+   q:"Which statement about credit card 'grace periods' is most accurate?",
+   choices:["They do not exist","They typically apply only when you pay your previous statement balance in full","They always last 90 days","They eliminate the need to ever pay your card"],
+   correct:1,
+   explain:"On many cards, a grace period on new purchases generally applies only when you pay the previous statement balance in full by the due date.",
+   tip:"Cash advances and balance transfers often do not get a grace period - check your card terms."},
+
+  {category:"Interest Rates", difficulty:"Beginner",
+   q:"A higher APR generally means:",
+   choices:["You pay less for borrowing","You pay more for borrowing","You get more rewards automatically","Your credit limit is higher"],
+   correct:1,
+   explain:"All else equal, a higher APR usually means a higher cost of borrowing money.",
+   tip:"Compare APRs when shopping for credit products - small APR differences can add up over time."},
+
+  {category:"Interest Rates", difficulty:"Intermediate",
+   q:"Compound interest on revolving debt generally means:",
+   choices:["Interest can be charged on previously unpaid interest","Interest is always free","You receive interest as a reward","Your balance shrinks faster than you pay"],
+   correct:0,
+   explain:"With many revolving credit products, unpaid interest can be added to the balance, and future interest may then be calculated on that larger balance.",
+   tip:"Carrying balances at high APRs over time can cost much more than the original purchase."},
+
+  {category:"Minimum Payments", difficulty:"Beginner",
+   q:"The minimum payment on a credit card is best described as:",
+   choices:["The smallest amount you can pay to keep the account in good standing that month","The full balance owed","An optional payment","A reward bonus"],
+   correct:0,
+   explain:"The minimum payment is typically the smallest amount required for that billing cycle to keep the account in good standing.",
+   tip:"Paying only the minimum keeps the account current but does not avoid interest if you carry a balance."},
+
+  {category:"Minimum Payments", difficulty:"Advanced",
+   q:"On many credit cards, paying only the minimum over time:",
+   choices:["Pays off the balance immediately","Often results in years of payments and significant total interest","Eliminates interest","Is automatically the best choice"],
+   correct:1,
+   explain:"For balances on high-APR cards, minimum-only payments can stretch payoff over many years and lead to high total interest.",
+   tip:"If possible, pay more than the minimum to reduce interest costs."},
+
+  {category:"Collections", difficulty:"Beginner",
+   q:"A debt going to collections usually means:",
+   choices:["You got a discount","An unpaid debt has been transferred or sold to a collection agency","Your score automatically increased","The debt no longer exists"],
+   correct:1,
+   explain:"Accounts in collections generally reflect an unpaid debt that has been transferred or sold to a collection agency for recovery.",
+   tip:"Collections can affect your credit; contacting the collector to verify the debt is often a reasonable first step."},
+
+  {category:"Collections", difficulty:"Intermediate",
+   q:"Before paying a collection account, a reasonable step is to:",
+   choices:["Ignore it","Verify the debt is yours and the amount is correct","Pay double to be safe","Take out a new loan immediately"],
+   correct:1,
+   explain:"Verifying the debt - including whether it is actually yours and the amount is correct - is generally a smart first step.",
+   tip:"You may have the right to request validation of a debt from a collector."},
+
+  {category:"Late Payments", difficulty:"Beginner",
+   q:"Late payments on credit accounts generally:",
+   choices:["Help your score","Can negatively affect your credit and may stay on your report for years","Only appear if you ask for them","Cancel your other accounts"],
+   correct:1,
+   explain:"Late payments can negatively affect credit scores and may remain on a credit report for several years.",
+   tip:"Setting up reminders or autopay for at least the minimum can help reduce the chance of missed due dates."},
+
+  {category:"Late Payments", difficulty:"Intermediate",
+   q:"Which strategy generally helps if you realize you might miss a payment?",
+   choices:["Ignore the bill completely","Contact the lender as soon as possible to discuss options","Cancel your bank account","Open new credit cards immediately"],
+   correct:1,
+   explain:"Contacting the lender early may open up hardship or payment-arrangement options that can reduce the damage.",
+   tip:"Lenders are often more willing to work with people who reach out before missing payments."},
+
+  {category:"Debt-to-Income", difficulty:"Beginner",
+   q:"Debt-to-income (DTI) ratio is best described as:",
+   choices:["Total debt compared to credit limits","Monthly debt payments compared to gross monthly income","Total savings compared to income","Tax rate compared to deductions"],
+   correct:1,
+   explain:"DTI is typically calculated as monthly debt payments divided by gross monthly income, often expressed as a percentage.",
+   tip:"DTI is used by many lenders, especially for mortgages and other large loans."},
+
+  {category:"Debt-to-Income", difficulty:"Intermediate",
+   q:"All else equal, a lower DTI generally signals:",
+   choices:["Higher risk","More room in your budget to handle additional debt","No income","Maxed-out credit"],
+   correct:1,
+   explain:"A lower DTI generally suggests more income headroom relative to existing debt payments, which lenders may view favorably.",
+   tip:"Reducing existing debt or increasing income can both improve DTI."},
+
+  {category:"Building Credit", difficulty:"Beginner",
+   q:"A common approach to start building credit responsibly is to:",
+   choices:["Avoid all credit products forever","Use a small amount on a credit-builder or secured card and pay on time","Take out as many cards as possible at once","Sign up for many payday loans"],
+   correct:1,
+   explain:"Some people start with credit-builder loans or secured cards used responsibly and paid on time to start building a credit history.",
+   tip:"Responsible use over time is more impactful than chasing many products at once."},
+
+  {category:"Building Credit", difficulty:"Intermediate",
+   q:"For long-term credit health, which habit is generally helpful?",
+   choices:["Maxing out cards every month","Keeping balances low and paying on time","Opening many accounts in a short window","Never checking your credit"],
+   correct:1,
+   explain:"Keeping balances low relative to limits and paying on time are widely-cited foundations of credit health.",
+   tip:"There is no single trick - it is mostly steady, boring habits over time."},
+
+  {category:"Building Credit", difficulty:"Advanced",
+   q:"Closing your oldest credit card account:",
+   choices:["Always increases your score","Can affect the length of credit history and available credit, which may impact your score","Has no effect under any circumstances","Erases all past payment history"],
+   correct:1,
+   explain:"Closing an old account can change the average age of accounts and reduce overall available credit - both of which can influence scores in different situations.",
+   tip:"Consider the tradeoffs (fees, usage, security) before closing a long-held account."},
+
+  {category:"Credit Myths", difficulty:"Beginner",
+   q:"Which of the following is a MYTH?",
+   choices:["Checking your own credit score in a typical consumer app lowers your score","Paying on time can support credit health","Late payments can hurt credit","Credit reports can contain errors"],
+   correct:0,
+   explain:"Checking your own score through standard consumer tools is generally a soft inquiry and does not lower your score.",
+   tip:"Personal credit checks via legitimate consumer apps are usually soft inquiries."},
+
+  {category:"Credit Myths", difficulty:"Beginner",
+   q:"Which of the following is a MYTH?",
+   choices:["You must carry a credit card balance every month to build credit","On-time payments matter for credit","Utilization can matter for credit","Credit cards charge interest if you carry a balance"],
+   correct:0,
+   explain:"Carrying a balance is not required to build credit. Using a card responsibly and paying it off can support credit health.",
+   tip:"You generally do not need to pay interest just to build credit."},
+
+  {category:"Credit Myths", difficulty:"Intermediate",
+   q:"Which statement is FALSE?",
+   choices:["Companies can legally erase truthful, accurate negative items from your credit report","Inaccurate items can be disputed","Late payments can stay on a report for years","Different scoring models can produce different scores"],
+   correct:0,
+   explain:"Truthful, accurate negative information generally cannot be legally erased simply by paying a 'credit repair' service. Be cautious of such claims.",
+   tip:"Be skeptical of any company that promises to remove accurate negative items from your credit report."},
+
+  {category:"Fraud Protection", difficulty:"Beginner",
+   q:"A credit freeze generally:",
+   choices:["Closes all your accounts","Restricts new creditors from accessing your credit file to open new accounts","Cancels your existing cards","Replaces your bank account"],
+   correct:1,
+   explain:"A credit freeze typically restricts most new creditors from accessing your credit file, which can help limit new accounts being opened in your name.",
+   tip:"You generally need to temporarily lift a freeze to apply for new credit."},
+
+  {category:"Fraud Protection", difficulty:"Beginner",
+   q:"A fraud alert on your credit file generally tells lenders to:",
+   choices:["Take extra steps to verify your identity before opening new accounts","Approve everything automatically","Close your existing accounts","Increase your credit limits"],
+   correct:0,
+   explain:"A fraud alert generally signals lenders to take extra steps to verify identity before opening new credit in your name.",
+   tip:"Fraud alerts are typically free and can be requested through the major credit bureaus."},
+
+  {category:"Fraud Protection", difficulty:"Intermediate",
+   q:"If you suspect identity theft, a reasonable first step is to:",
+   choices:["Ignore it","Review your credit reports for unfamiliar accounts and consider placing a fraud alert or freeze","Open more new credit cards","Stop checking your accounts"],
+   correct:1,
+   explain:"Reviewing reports for unfamiliar activity and considering a fraud alert or freeze are commonly recommended early steps after suspected identity theft.",
+   tip:"Reporting suspected identity theft to the relevant authorities is also commonly recommended."},
+
+  {category:"Responsible Borrowing", difficulty:"Beginner",
+   q:"Before taking on new debt, a reasonable question to ask is:",
+   choices:["What is the highest balance I can put on a card?","Can I realistically afford the payments under the total cost of borrowing?","How can I avoid reading the terms?","Which lender will not check my credit?"],
+   correct:1,
+   explain:"Considering whether you can afford the full cost of borrowing (including interest and fees) is a core part of responsible borrowing.",
+   tip:"Reading the full terms, including APR and fees, helps avoid surprises later."},
+
+  {category:"Responsible Borrowing", difficulty:"Beginner",
+   q:"Which of these is typically a SIGN of unhealthy borrowing?",
+   choices:["Paying balances on time and in full when possible","Relying on new debt to pay old debt repeatedly","Saving an emergency fund","Reading loan terms before signing"],
+   correct:1,
+   explain:"Repeatedly using new debt to cover old debt can be a warning sign of an unsustainable pattern.",
+   tip:"If borrowing feels like the only way to keep up, it may be time to seek non-profit financial counseling."},
+
+  {category:"Responsible Borrowing", difficulty:"Intermediate",
+   q:"All else equal, which loan is generally MORE expensive over time?",
+   choices:["A loan with a higher APR over the same term","A loan with a lower APR over the same term","A loan with no fees and a low APR","A 0% promotional offer paid in full before it ends"],
+   correct:0,
+   explain:"All else equal, higher APRs over the same term generally cost more in interest over the life of the loan.",
+   tip:"Comparing APRs and total cost of borrowing - not just monthly payment - helps reveal the true cost."},
+
+  {category:"Credit Scores", difficulty:"Advanced",
+   q:"Which factor below is generally NOT used directly in most consumer credit-scoring models?",
+   choices:["Your race or religion","Payment history","Credit utilization","Length of credit history"],
+   correct:0,
+   explain:"Consumer credit-scoring models generally do not use protected characteristics like race or religion directly.",
+   tip:"Scoring models focus on credit-account behavior, not personal demographics."},
+
+  {category:"Credit Cards", difficulty:"Intermediate",
+   q:"A balance transfer typically involves:",
+   choices:["Moving a balance from one credit card to another, often with promotional terms","Donating money to charity","Refinancing your house","Sending cash to a friend"],
+   correct:0,
+   explain:"A balance transfer typically moves a balance from one card to another, often under promotional interest terms.",
+   tip:"Balance transfer fees and what happens after the promotional period are important details to check."},
+
+  {category:"Credit Reports", difficulty:"Advanced",
+   q:"Most negative items (like late payments) generally:",
+   choices:["Stay on your report indefinitely no matter what","Have a maximum reporting period defined by consumer protection rules","Are removed instantly when you ask","Appear only on bank statements, not credit reports"],
+   correct:1,
+   explain:"Many negative items have a maximum reporting period set by consumer protection laws, after which they generally fall off the report.",
+   tip:"Different categories of negative items can have different reporting time limits."},
+
+  {category:"Interest Rates", difficulty:"Advanced",
+   q:"A 'variable' APR on a credit product means the rate can:",
+   choices:["Never change","Change based on an index like a prime rate","Decrease automatically every year","Only increase if you miss payments"],
+   correct:1,
+   explain:"Variable APRs are often tied to an index such as a prime rate, so they can rise or fall with that index over time.",
+   tip:"If rates rise, the cost of carrying a variable-rate balance can also rise."},
+
+  {category:"Building Credit", difficulty:"Advanced",
+   q:"Becoming an authorized user on a responsible primary cardholder's account can sometimes:",
+   choices:["Help you build credit history if the issuer reports it","Always lower your score","Replace your own credit file","Eliminate your own debts"],
+   correct:0,
+   explain:"On accounts where the issuer reports authorized-user activity, this status can sometimes help build credit history - but it depends on the issuer and the primary user's habits.",
+   tip:"The primary cardholder's behavior strongly affects whether being added helps or hurts."},
+
+  {category:"Collections", difficulty:"Advanced",
+   q:"Paying off a collection account:",
+   choices:["Always instantly raises your score by 100 points","May reduce future negative reporting and is often a step toward resolution, but exact score impact varies","Removes the account from your report immediately by law","Adds new positive accounts automatically"],
+   correct:1,
+   explain:"Paying a collection can be a step toward resolution, but exact score impact depends on the scoring model and overall credit profile.",
+   tip:"Get any settlement terms in writing before sending money to a collector."},
+
+  {category:"Fraud Protection", difficulty:"Advanced",
+   q:"Which of these is generally a stronger protection against new accounts being opened in your name?",
+   choices:["A credit freeze","Hiding your social security number in your wallet","Posting a public notice online","Closing all your bank accounts"],
+   correct:0,
+   explain:"A credit freeze restricts most new creditors from accessing your credit file, generally providing stronger protection against new fraudulent accounts than informal measures.",
+   tip:"Freezes can usually be lifted temporarily when you want to apply for credit yourself."},
+
+  {category:"Responsible Borrowing", difficulty:"Advanced",
+   q:"Educational projections and lessons in this app:",
+   choices:["Are personalized financial advice","Are general educational information, not advice for your specific situation","Replace the need for a financial professional","Guarantee a specific outcome"],
+   correct:1,
+   explain:"This app is for educational awareness only - it does not provide individualized legal, financial, credit repair, or lending advice.",
+   tip:"For decisions specific to your situation, consult a qualified professional or the relevant financial institution."},
+
+  {category:"Credit Utilization", difficulty:"Beginner",
+   q:"If your credit card limit is $1,000 and your reported balance is $300, your utilization on that card is approximately:",
+   choices:["3%","30%","70%","100%"],
+   correct:1,
+   explain:"$300 / $1,000 = 30% utilization on that card.",
+   tip:"You can lower reported utilization by paying down balances before the statement closing date."},
+];
+
+const QUESTIONS_PER_ROUND = 10;
+
+const state = {
+  round: [],
+  index: 0,
+  score: 0,
+  streak: 0,
+  bestStreak: 0,
+  answered: false,
+};
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('screen-' + id);
+  if (el) el.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startChallenge() {
+  state.round = shuffle(BANK).slice(0, QUESTIONS_PER_ROUND);
+  state.index = 0;
+  state.score = 0;
+  state.streak = 0;
+  state.bestStreak = 0;
+  state.answered = false;
+  showScreen('quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  state.answered = false;
+  const q = state.round[state.index];
+
+  document.getElementById('hud-qnum').textContent = (state.index + 1) + ' / ' + state.round.length;
+  document.getElementById('hud-score').textContent = String(state.score);
+  document.getElementById('hud-streak').textContent = String(state.streak);
+  document.getElementById('progress').style.width = ((state.index) / state.round.length * 100) + '%';
+
+  document.getElementById('b-cat').textContent = q.category;
+  const bDiff = document.getElementById('b-diff');
+  bDiff.textContent = q.difficulty;
+  bDiff.className = 'badge ' + q.difficulty.toLowerCase();
+
+  document.getElementById('q-text').textContent = q.q;
+
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice';
+    btn.innerHTML = '<span class="marker">' + letters[i] + '</span><span>' + escapeHtml(c) + '</span>';
+    btn.addEventListener('click', () => handleAnswer(i, btn));
+    choicesEl.appendChild(btn);
+  });
+
+  document.getElementById('feedback').style.display = 'none';
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+    .replaceAll('"','&quot;').replaceAll("'",'&#39;');
+}
+
+function handleAnswer(choiceIdx, btn) {
+  if (state.answered) return;
+  state.answered = true;
+
+  const q = state.round[state.index];
+  const buttons = document.querySelectorAll('#choices .choice');
+  buttons.forEach((b, i) => {
+    b.classList.add('disabled');
+    if (i === q.correct) b.classList.add('correct');
+    else if (i === choiceIdx) b.classList.add('incorrect');
+  });
+
+  const isCorrect = (choiceIdx === q.correct);
+  if (isCorrect) {
+    state.score += 1;
+    state.streak += 1;
+    if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+  } else {
+    state.streak = 0;
+  }
+  document.getElementById('hud-score').textContent = String(state.score);
+  document.getElementById('hud-streak').textContent = String(state.streak);
+  document.getElementById('progress').style.width = ((state.index + 1) / state.round.length * 100) + '%';
+
+  const fb = document.getElementById('feedback');
+  fb.style.display = 'block';
+  fb.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+  document.getElementById('f-head').textContent = isCorrect ? 'Correct' : 'Not quite';
+  document.getElementById('f-answer').textContent = q.choices[q.correct];
+  document.getElementById('f-explain').textContent = q.explain;
+  document.getElementById('f-tip').textContent = 'Credit tip: ' + q.tip;
+
+  document.getElementById('btn-next').textContent =
+    (state.index + 1 >= state.round.length) ? 'See Results' : 'Next Question';
+}
+
+function nextQuestion() {
+  if (!state.answered) return;
+  if (state.index + 1 >= state.round.length) {
+    showResults();
+    return;
+  }
+  state.index += 1;
+  renderQuestion();
+}
+
+function showResults() {
+  const total = state.round.length;
+  const score = state.score;
+  const pct = Math.round((score / total) * 100);
+
+  let rating, feedback;
+  if (pct >= 90)      { rating = 'Credit Master';        feedback = 'Outstanding. Your credit knowledge is sharp - keep practicing safe credit habits in real life.'; }
+  else if (pct >= 75) { rating = 'Credit Builder';       feedback = 'Strong work. You have a solid foundation - keep building.'; }
+  else if (pct >= 60) { rating = 'Money Student';        feedback = 'Good base. Review the explanations and run another round to lock it in.'; }
+  else                { rating = 'Needs More Practice';  feedback = 'Keep going. Read each explanation carefully and try again - awareness builds over time.'; }
+
+  document.getElementById('r-rating').textContent = rating;
+  document.getElementById('r-score').textContent = score + ' / ' + total;
+  document.getElementById('r-pct').textContent = pct + '%' + (state.bestStreak ? '  •  Best streak: ' + state.bestStreak : '');
+  document.getElementById('r-feedback').textContent = feedback;
+
+  showScreen('results');
+}
+
+document.getElementById('btn-start').addEventListener('click', startChallenge);
+document.getElementById('btn-how').addEventListener('click', () => showScreen('how'));
+document.getElementById('btn-privacy').addEventListener('click', () => showScreen('privacy'));
+document.getElementById('btn-how-start').addEventListener('click', startChallenge);
+document.getElementById('btn-next').addEventListener('click', nextQuestion);
+document.getElementById('btn-again').addEventListener('click', startChallenge);
+document.getElementById('btn-home').addEventListener('click', () => showScreen('home'));
+document.querySelectorAll('[data-back]').forEach(el => {
+  el.addEventListener('click', () => showScreen(el.getAttribute('data-back')));
+});
+</script>
+</body>
+</html>
