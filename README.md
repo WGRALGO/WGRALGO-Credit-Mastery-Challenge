@@ -1,14 +1,13 @@
 # WGRALGO Credit Mastery Challenge
 
 Credit Mastery Challenge is a free educational Android app from
-**The Wealth Gap Resolution Algorithm&trade; Inc.** It helps users practice
-credit knowledge through a randomized 50-question quiz covering credit scores,
-credit reports, payment history, utilization, inquiries, fraud protection, and
-responsible borrowing.
+**The Wealth Gap Resolution Algorithm&trade; Inc.** Test what you know about
+credit scores, credit cards, debt, and protecting your identity, and learn to
+spot the common **credit myths** that sound right but aren't.
 
 The app is offline-first, free, ad-free, and tracker-free.
 
-- Version: **1.0.0**
+- Version: **1.1.0**
 - Package: `org.wgralgo.creditmasterychallenge`
 - License: **GNU General Public License v3.0**
 - Owner / Publisher: WGRALGO &mdash; The Wealth Gap Resolution Algorithm&trade; Inc.
@@ -16,43 +15,52 @@ The app is offline-first, free, ad-free, and tracker-free.
 
 ## Features
 
-- 50-question offline credit-knowledge bank
-- 10 randomized questions per round
-- Difficulty badges (Beginner / Intermediate / Advanced)
-- Category badges (Credit Scores, Payment History, Utilization, Inquiries,
-  Reports, Cards, Interest Rates, Minimum Payments, Collections, Late
-  Payments, Debt-to-Income, Building Credit, Credit Myths, Fraud Protection,
-  Responsible Borrowing)
-- Instant correct / incorrect feedback
-- Plain-language explanations for every question
-- Short credit education tips on every question
-- Score, streak, and final mastery rating
-  - 90&ndash;100%: Credit Master
-  - 75&ndash;89%: Credit Builder
-  - 60&ndash;74%: Money Student
-  - Below 60%: Needs More Practice
-- Tablet and phone responsive
-- Black and gold WGRALGO design language
+- **60-question bank**, 20 per level: **Beginner** (credit basics),
+  **Intermediate** (real-life situations), and **Expert** (debt and tricky cases).
+- Pick **All Levels** (easy to hard) or one level. 10 random questions per round,
+  with no repeats until the bank runs out.
+- Answer order is shuffled every time, so any letter can be correct.
+- Instant feedback with a plain-language lesson after every answer.
+- **Myth busters:** pick a common credit myth and the app explains why it's wrong.
+- Results with your score, a question-by-question review, and a running total
+  across rounds.
+- **Looks like a real app:** black launch screen with the big logo, a new
+  launcher icon, a solid app bar, About / Privacy / Credits panels, and
+  Android back-button support (back asks before quitting a round, returns to
+  the level picker from results, and asks before exiting the app).
 
 ## Screenshots
 
-| Home | How It Works | Privacy |
-|---|---|---|
-| ![Home](screenshots/01-home.png) | ![How It Works](screenshots/02-how-it-works.png) | ![Privacy](screenshots/03-privacy.png) |
+| Launch | Home | Question | Feedback |
+|---|---|---|---|
+| ![Launch](screenshots/01-splash.png) | ![Home](screenshots/02-home.png) | ![Question](screenshots/03-question.png) | ![Feedback](screenshots/04-feedback.png) |
 
-| Question | Feedback | Results |
+| Results | Menu | About |
 |---|---|---|
-| ![Question](screenshots/04-question.png) | ![Feedback](screenshots/05-feedback.png) | ![Results](screenshots/06-results.png) |
+| ![Results](screenshots/05-results.png) | ![Menu](screenshots/06-menu.png) | ![About](screenshots/07-about.png) |
 
 ## Install / sideload the APK
 
-1. Download `CreditMasteryChallenge-v1.0.0.apk` from the
+1. Download `CreditMasteryChallenge-v1.1.0.apk` from the
    [latest release](../../releases/latest).
 2. On your Android phone, allow installs from unknown sources for your
    browser or file manager.
 3. Open the APK file on the device and confirm install.
 4. Optionally verify the SHA-256 of the APK matches
-   `CreditMasteryChallenge-v1.0.0.apk.sha256` before installing.
+   `CreditMasteryChallenge-v1.1.0.apk.sha256` before installing.
+
+> **Upgrading from v1.0.0?** Version 1.1.0 is signed with a new key, so it
+> can't install over the old app. Uninstall v1.0.0 first, then install v1.1.0.
+> The app saves nothing on your device, so nothing is lost.
+
+### Signing certificate (v1.1.0 and later)
+
+- `CN=WGRALGO, OU=Credit Mastery Challenge, O=The Wealth Gap Resolution Algorithm Inc, C=US`
+- SHA-256: `24:33:F7:9D:C2:F7:23:3D:56:29:A4:9D:E6:92:70:5B:ED:F7:69:46:D9:6C:96:45:E9:71:9C:B1:E6:C9:6F:CF`
+
+```bash
+apksigner verify --print-certs CreditMasteryChallenge-v1.1.0.apk
+```
 
 ## Build from source
 
@@ -82,6 +90,22 @@ CMC_KEY_PASSWORD=...
 ```
 
 Or a `keystore.properties` file in `android/` with the same keys.
+
+Check a build before publishing:
+
+```bash
+bash tools/validate-release.sh android/app/build/outputs/apk/release/app-release.apk
+```
+
+## Continuous integration and releases
+
+- [`.github/workflows/android.yml`](.github/workflows/android.yml) builds a
+  debug APK on every push and pull request.
+- [`.github/workflows/release.yml`](.github/workflows/release.yml) builds,
+  validates, signs, and publishes `CreditMasteryChallenge-v<version>.apk` with
+  its `.sha256` to GitHub Releases. Run it from the **Actions** tab or push a
+  `v*` tag. It needs these repository secrets: `CMC_KEYSTORE_BASE64`,
+  `CMC_KEYSTORE_PASSWORD`, `CMC_KEY_ALIAS`, `CMC_KEY_PASSWORD`.
 
 ## Privacy summary
 

@@ -3,7 +3,7 @@
 **App:** WGRALGO Credit Mastery Challenge
 **Publisher:** WGRALGO &mdash; The Wealth Gap Resolution Algorithm&trade; Inc.
 **Package:** `org.wgralgo.creditmasterychallenge`
-**Version:** 1.0.0
+**Version:** 1.1.0
 
 ## What this app collects
 
@@ -21,7 +21,7 @@
 
 ## Android permissions
 
-This APK does **not** declare the `INTERNET` permission. It also does not
+This APK does **not** declare the `INTERNET` permission (it is stripped from the final manifest). It also does not
 declare `ACCESS_NETWORK_STATE` or any tracking/analytics permissions.
 
 ## Local data
