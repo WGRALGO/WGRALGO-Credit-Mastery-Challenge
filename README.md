@@ -7,7 +7,8 @@ spot the common **credit myths** that sound right but aren't.
 
 The app is offline-first, free, ad-free, and tracker-free.
 
-- Version: **1.1.0**
+- Version: **2.0.0**
+- Devices: phones and tablets, portrait and landscape
 - Package: `org.wgralgo.creditmasterychallenge`
 - License: **GNU General Public License v3.0**
 - Owner / Publisher: WGRALGO &mdash; The Wealth Gap Resolution Algorithm&trade; Inc.
@@ -41,13 +42,13 @@ The app is offline-first, free, ad-free, and tracker-free.
 
 ## Install / sideload the APK
 
-1. Download `CreditMasteryChallenge-v1.1.0.apk` from the
+1. Download `WGRALGO-CreditMasteryChallenge-v2.0.0.apk` from the
    [latest release](../../releases/latest).
 2. On your Android phone, allow installs from unknown sources for your
    browser or file manager.
 3. Open the APK file on the device and confirm install.
 4. Optionally verify the SHA-256 of the APK matches
-   `CreditMasteryChallenge-v1.1.0.apk.sha256` before installing.
+   `WGRALGO-CreditMasteryChallenge-v2.0.0.apk.sha256` before installing.
 
 > **Upgrading from v1.0.0?** Version 1.1.0 is signed with a new key, so it
 > can't install over the old app. Uninstall v1.0.0 first, then install v1.1.0.
@@ -59,7 +60,7 @@ The app is offline-first, free, ad-free, and tracker-free.
 - SHA-256: `24:33:F7:9D:C2:F7:23:3D:56:29:A4:9D:E6:92:70:5B:ED:F7:69:46:D9:6C:96:45:E9:71:9C:B1:E6:C9:6F:CF`
 
 ```bash
-apksigner verify --print-certs CreditMasteryChallenge-v1.1.0.apk
+apksigner verify --print-certs WGRALGO-CreditMasteryChallenge-v2.0.0.apk
 ```
 
 ## Build from source

@@ -3,7 +3,7 @@
 **App:** WGRALGO Credit Mastery Challenge
 **Publisher:** WGRALGO &mdash; The Wealth Gap Resolution Algorithm&trade; Inc.
 **Package:** `org.wgralgo.creditmasterychallenge`
-**Version:** 1.1.0
+**Version:** 2.0.0
 
 ## What this app collects
 
